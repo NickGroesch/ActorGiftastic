@@ -7,6 +7,7 @@ $(document).ready(function() {
     "Samuel L Jackson",
     "Christopher Walkin"
   ];
+  var showMore = 0;
   //   dynamically create html layout
   $(".container")
     .append($("<div>").addClass("titleSpace"))
@@ -33,7 +34,8 @@ $(document).ready(function() {
       $("<button>")
         .addClass("newStar")
         .text("Add Star")
-    );
+    )
+    .append($("<div>").addClass("moreButton"));
 
   // produce buttons from the topics array
   function makeButtons() {
@@ -52,7 +54,6 @@ $(document).ready(function() {
   $(document).on("click", ".newStar", function() {
     topics.push($(".userStar").val());
     makeButtons();
-    console.log(topics);
   });
   // handles the (dis)animation
   $(document).on("click", ".gif", function() {
@@ -64,19 +65,22 @@ $(document).ready(function() {
       $(this).data("state", "still");
     }
   });
+  var userQuery;
+  var codeQuery;
+  var myAPIkey;
+  var queryUrl;
   //   handles the ajax call
   $(document).on("click", ".topicButton", function() {
-    var userQuery = $(this).data("name");
-    var codeQuery = `&q=${userQuery.split(" ").join("+")}`;
-    let myAPIkey = "&api_key=nEYg13rE5PUMBlMIhGkUnbSWTWbMboiH";
-    var queryUrl = `https://cors-anywhere.herokuapp.com/https://api.giphy.com/v1/gifs/search?limit=10${codeQuery}${myAPIkey}`;
-    console.log(queryUrl);
-
+    userQuery = $(this).data("name");
+    codeQuery = `&q=${userQuery.split(" ").join("+")}`;
+    myAPIkey = "&api_key=nEYg13rE5PUMBlMIhGkUnbSWTWbMboiH";
+    queryUrl = `https://cors-anywhere.herokuapp.com/https://api.giphy.com/v1/gifs/search?limit=10${codeQuery}${myAPIkey}`;
+    $(".displaySpace").empty();
+    $(".moreButton").empty();
     $.ajax({
       url: queryUrl,
       method: "GET"
     }).then(function(response) {
-      console.log(response);
       let i = 0;
       while (i < 10) {
         $(".displaySpace")
@@ -91,6 +95,37 @@ $(document).ready(function() {
           .append($(`<p> Rated: ${response.data[i].rating}</p>`));
         i++;
       }
+    });
+    $(".moreButton").append(
+      $("<button>")
+        .addClass("showMore")
+        .text(`Show Me More ${userQuery}`)
+    );
+    showMore = 1;
+  });
+
+  $(document).on("click", ".showMore", function() {
+    queryUrl = `https://cors-anywhere.herokuapp.com/https://api.giphy.com/v1/gifs/search?limit=10${codeQuery}${myAPIkey}&offset=${10 *
+      showMore}`;
+    $.ajax({
+      url: queryUrl,
+      method: "GET"
+    }).then(function(response) {
+      let i = 0;
+      while (i < 10) {
+        $(".displaySpace")
+          .append(
+            $(`<img src=${response.data[i].images.fixed_width_still.url}>`)
+              .attr(`src`, response.data[i].images.fixed_width_still.url)
+              .attr("data-still", response.data[i].images.fixed_width_still.url)
+              .attr("data-animated", response.data[i].images.fixed_width.url)
+              .attr("data-state", "still")
+              .addClass("gif")
+          )
+          .append($(`<p> Rated: ${response.data[i].rating}</p>`));
+        i++;
+      }
+      showMore++;
     });
   });
 });
