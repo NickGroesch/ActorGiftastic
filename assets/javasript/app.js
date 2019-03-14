@@ -65,6 +65,23 @@ $(document).ready(function() {
       $(this).data("state", "still");
     }
   });
+  // appends gifs to display
+  function appendGif(response) {
+    let i = 0;
+    while (i < 10) {
+      $(".displaySpace")
+        .append(
+          $(`<img src= ${response.data[i].images.fixed_width_still.url} >`)
+            .attr(`src`, response.data[i].images.fixed_width_still.url)
+            .attr("data-still", response.data[i].images.fixed_width_still.url)
+            .attr("data-animated", response.data[i].images.fixed_width.url)
+            .attr("data-state", "still")
+            .addClass("gif")
+        )
+        .append($(`<p> Rated: ${response.data[i].rating}</p>`));
+      i++;
+    }
+  }
   var userQuery;
   var codeQuery;
   var myAPIkey;
@@ -81,20 +98,7 @@ $(document).ready(function() {
       url: queryUrl,
       method: "GET"
     }).then(function(response) {
-      let i = 0;
-      while (i < 10) {
-        $(".displaySpace")
-          .append(
-            $(`<img src= ${response.data[i].images.fixed_width_still.url} >`)
-              .attr(`src`, response.data[i].images.fixed_width_still.url)
-              .attr("data-still", response.data[i].images.fixed_width_still.url)
-              .attr("data-animated", response.data[i].images.fixed_width.url)
-              .attr("data-state", "still")
-              .addClass("gif")
-          )
-          .append($(`<p> Rated: ${response.data[i].rating}</p>`));
-        i++;
-      }
+      appendGif(response);
     });
     $(".moreButton").append(
       $("<button>")
@@ -111,20 +115,7 @@ $(document).ready(function() {
       url: queryUrl,
       method: "GET"
     }).then(function(response) {
-      let i = 0;
-      while (i < 10) {
-        $(".displaySpace")
-          .append(
-            $(`<img src=${response.data[i].images.fixed_width_still.url}>`)
-              .attr(`src`, response.data[i].images.fixed_width_still.url)
-              .attr("data-still", response.data[i].images.fixed_width_still.url)
-              .attr("data-animated", response.data[i].images.fixed_width.url)
-              .attr("data-state", "still")
-              .addClass("gif")
-          )
-          .append($(`<p> Rated: ${response.data[i].rating}</p>`));
-        i++;
-      }
+      appendGif(response);
       showMore++;
     });
   });
